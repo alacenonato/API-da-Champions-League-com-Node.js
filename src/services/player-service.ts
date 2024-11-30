@@ -25,10 +25,10 @@ export const getPlayerByIdService = async (id: number) => {
     const data = await PlayerRepository.findPlayerById(id);
     let response = null;
     if (data) {
-        response = HttpResponse.ok(data);
+        response = await HttpResponse.ok(data);
 
     } else {
-        response = HttpResponse.noContent();
+        response = await HttpResponse.noContent();
     }
 
     return response;
@@ -40,23 +40,38 @@ export const createPlayerService = async (player: PlayerModel) => {
 
     let response = null;
 
-    if(Object.keys(player).length !== 0) {
+    if (Object.keys(player).length !== 0) {
         await PlayerRepository.insertPlayer(player);
-        response = HttpResponse.created();
+        response = await HttpResponse.created();
 
     } else {
-        response = HttpResponse.badRequest();
+        response = await HttpResponse.badRequest();
     }
     return response;
 };
 
-export const deletePlayerService = async (id:number) => {
+export const deletePlayerService = async (id: number) => {
     let response = null;
     await PlayerRepository.deleteOnePlayer(id);
-    response = HttpResponse.ok({message: "Player deleted successfully"});
+
+    
+
+
+    response = await HttpResponse.ok({ message: "Player deleted successfully" });
     return response;
 }
 
-export const updatePlayerService = async(id: number, statistics: StatisticsModel) => {	
+export const updatePlayerService = async (id: number, statistics: StatisticsModel) => {
+    const data = await PlayerRepository.findAndModifyPlayer(id, statistics);
+    let response = null;
+    if (Object.keys(data).length === 0) {
+        response = await HttpResponse.badRequest();
+    } else {
+        response = await HttpResponse.ok(data);
+    }
+
+
+
+    return response;
 
 }
